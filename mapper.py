@@ -1,11 +1,12 @@
 class Route:
-	def __init__(self, network, via, moi):
+	def __init__(self, network, via, moi, metric):
 		self.network = network
 		self.via = via
 		self.moi = moi
+		self.metric = metric
 
 	def getRoute(self):
-		return self.network
+		return self.network+"\n(Metric: "+self.metric+")"
 
 	def getVia(self):
 		return self.via
@@ -22,8 +23,8 @@ def getRoutes(babelArray, myID):
 	for line in babelArray:
 		elements = line.split(" ")
 		
-		if elements[0] == "add" and elements[1] == "route":
-			routes.append(Route(elements[4], elements[10], myID))
+		if elements[0] == "add" and elements[1] == "route" and elements[8] == "yes":
+			routes.append(Route(elements[4], elements[10], myID, elements[12]))
 
 	return routes
 
@@ -66,8 +67,8 @@ def makeGraph(peersFile):
 
 	graph="graph networkMap {"
 
-	"Yeeet"
-	#graph+="graph [pad=\"5\", nodesep=\"0.1\", ranksep=\"10\"]"
+	"Add some spacing between nodes (vertically)"
+	graph+="graph [ranksep=\"2\"]"
 
 	for route in routes:
 		graph += "\""+route.getMoi()+"\" -- \""+route.getVia() +"\" [label=\""+route.getRoute()+"\"]"
@@ -80,6 +81,6 @@ def makeGraph(peersFile):
 	file.close()
 
 	import os
-	os.system("cat thing.dot | dot -Tsvg -o graph.svg")
+	os.system("cat thing.dot | dot -Tpng -o graph.png")
 
 makeGraph("peers.list")
